@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+    <head>
+        <title>{{ title }}</title>
+        <script src='https://www.gstatic.com/charts/loader.js'></script>
+        <script type="text/javascript">
+            google.charts.load("current", { packages:["corechart"] });
+            google.charts.setOnLoadCallback(drawChart);
+
+            function drawChart() {
+                var data = new google.visualization.DataTable();
+                data.addColumn('number', 'Hour');
+                data.addColumn('number', 'Original');
+                data.addColumn('number', 'Smoothed');
+                data.addColumn('number', 'Forecast');
+                data.addRows({{{ chartDataPoints }}});
+
+                var options = {
+                    interpolateNulls: true,
+                    pointShape: 'circle',
+                    series: {
+                        0: { pointShape: 'circle', color: '#FA8072' },
+                        1: { pointShape: 'circle', color: '#0EBFE9' },
+                        2: { pointSize: 12, pointShape: 'star', lineWidth: 0, color: '#000' }
+                    }
+                };
+
+                var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+                chart.draw(data, options);
+            }
+        </script>
+        <link rel='stylesheet' href='/stylesheets/style.css'/>
+    </head>
+    <body>
+        <h1>{{ title }}</h1>
+        <img src="./images/einstein.png" width="250" class="einstein-image"/>
+        <p>An attempt at using time series smoothing to predict number of requests to the API</p>
+        <p>Will it work? Nobody knows</p>
+
+        <div class="main-panel">
+            <h2>Request data from CloudWatch</h2>
+            <img src="{{ originalDataChart }}" />
+
+            <h2>Smoothed data (John Ehlers iTrend)</h2>
+            <img src="{{ smoothedDataChart }}" />
+
+            <h2>Predictions vs. Actual</h2>
+
+            <table style="width:100%">
+                <tr>
+                    <th>Time</th>
+                    <th>Requests predicted</th>
+                    <th>Requests actual</th>
+                    <th>Percentage change</th>
+                </tr>
+                <tr>
+                    <td>13:00 10th May 16</td>
+                    <td>8,679</td>
+                    <td>8,709</td>
+                    <td>-0.3%</td>
+                </tr>
+                <tr>
+                    <td>20:00 10th May 16</td>
+                    <td>15,266</td>
+                    <td>16,255</td>
+                    <td>-6%</td>
+                </tr>
+                <tr>
+                    <td>01:00 11th May 16</td>
+                    <td>1,301</td>
+                    <td>886</td>
+                    <td>+46%</td>
+                </tr>
+                <tr>
+                    <td>08:00 11th May 16</td>
+                    <td>8,158</td>
+                    <td>9,670</td>
+                    <td>-15%</td>
+                </tr>
+                <tr>
+                    <td>16:00 11th May 16</td>
+                    <td>13,582</td>
+                    <td>15,143</td>
+                    <td>-10%</td>
+                </tr>
+                <tr>
+                    <td>00:00 13th May 16</td>
+                    <td>972</td>
+                    <td>716</td>
+                    <td>+35%</td>
+                </tr>
+            </table>
+
+            <div id="chart_div" style="width: 900px; height: 500px;"></div>
+        </div>
+    </body>
+</html>
